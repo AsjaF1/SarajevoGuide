@@ -18,7 +18,7 @@ namespace SarajevoGuide.Data
 
             var connectionString = configuration.GetConnectionString("DefaultConnection");
 
-            builder.UseSqlServer(connectionString);
+            builder.UseMySql(connectionString, ServerVersion.AutoDetect(connectionString));
 
             return new ApplicationDbContext(builder.Options);
         }

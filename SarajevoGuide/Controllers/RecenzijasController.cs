@@ -58,38 +58,36 @@ namespace SarajevoGuide.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("Id,KorisnikId,EventId,Komentar,Ocjena")] Recenzija recenzija)
+        public async Task<IActionResult> Create([Bind("EventId,Komentar,Ocjena")] Recenzija recenzija)
         {
+            // Get logged-in user
             var email = User.FindFirstValue(ClaimTypes.Email);
             var korisnik = _context.RegistrovaniKorisnik.FirstOrDefault(x => x.email == email);
-            if (korisnik == null) return BadRequest();
+            if (korisnik == null)
+            {
+                return RedirectToAction("Login", "Account"); // user must be logged in
+            }
 
             recenzija.KorisnikId = korisnik.id;
 
+            // Server-side validation: make sure rating is set
+            if (recenzija.Ocjena < 1 || recenzija.Ocjena > 5)
+            {
+                ModelState.AddModelError("Ocjena", "Molimo odaberite ocjenu između 1 i 5.");
+            }
+
             if (!ModelState.IsValid)
             {
-                return View(recenzija); // prikazuje formu ponovo s validacijom
+                return View(recenzija); // redisplay form with validation errors
             }
 
             _context.Recenzija.Add(recenzija);
             await _context.SaveChangesAsync();
-            return RedirectToAction("Index", "Home"); // redirekcija nakon uspjeha
+
+            // Redirect to Event Details page after submission
+            return RedirectToAction("Index", "Home", new { id = recenzija.EventId });
         }
 
-        public IActionResult Reviews()
-        {
-            var recenzije = _context.Recenzija.ToList();
-            var korisnici = _context.RegistrovaniKorisnik.ToDictionary(k => k.id, k => k.username);
-
-            var model = recenzije.Select(r => new
-            {
-                Username = korisnici.TryGetValue(r.KorisnikId, out var username) ? username : "Nepoznat",
-                Ocjena = r.Ocjena,
-                Komentar = r.Komentar
-            }).ToList();
-
-            return View(model);
-        }
 
 
 

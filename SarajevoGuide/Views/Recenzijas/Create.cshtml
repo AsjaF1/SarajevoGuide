@@ -1,7 +1,7 @@
 ﻿@model SarajevoGuide.Models.Recenzija
 
 @{
-    ViewData["Title"] = "Create";
+    ViewData["Title"] = "Create Review";
 }
 
 <div class="d-flex justify-content-center align-items-center" style="min-height: 80vh;">
@@ -35,16 +35,26 @@
 
 @section Scripts {
     <script>
-        // Zvjezdice za ocjenu (ostaje da se snimi ocjena)
-        document.querySelectorAll('.star').forEach((star, index) => {
+        const stars = document.querySelectorAll('.star');
+        const ocjenaInput = document.getElementById("Ocjena");
+
+        // Zvjezdice: klik postavlja ocjenu i boju
+        stars.forEach((star, index) => {
             star.addEventListener('click', () => {
-                document.querySelectorAll('.star').forEach((s, i) => {
+                stars.forEach((s, i) => {
                     s.textContent = i <= index ? '★' : '☆';
                     s.style.color = i <= index ? 'gold' : 'gray';
                 });
-
-                document.getElementById("Ocjena").value = index + 1;
+                ocjenaInput.value = index + 1;
             });
+        });
+
+        // Validacija prije submit-a
+        document.querySelector('form').addEventListener('submit', (e) => {
+            if (!ocjenaInput.value) {
+                alert("Molimo odaberite ocjenu!");
+                e.preventDefault();
+            }
         });
     </script>
 }

@@ -61,7 +61,7 @@ namespace SarajevoGuide.Controllers
         {
             var userEmail = User.FindFirstValue(ClaimTypes.Email);
             if (userEmail == null)
-                return RedirectToAction("Index", "RegistrovaniKorisniks");
+                return RedirectToAction("Index", "Home");
 
             var korisnik = _context.RegistrovaniKorisnik
                                    .FirstOrDefault(k => k.email == userEmail);
